@@ -2,8 +2,7 @@
 #include <memory>
 #include <string>
 #include <cmath>
-#include <cstdlib>
-#include <time.h>
+#include <random>
 
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/float64.hpp"
@@ -18,27 +17,29 @@ class Noisepublisher : public rclcpp::Node
 {
 public:
   Noisepublisher()
-  : Node("noise_publisher"), count_(0)
+  : Node("noise_publisher"), count_(0),amplitude_(100.0)
   {
     publisher_ = this->create_publisher<std_msgs::msg::Float64>("noise", 10);   
-    timer_ = this->create_wall_timer(10ms, [this](){data_make();});
-    srand((unsigned)time(NULL));
+    timer_ = this->create_wall_timer(1ms, [this](){data_make();});
   }
 
 private:
   rclcpp::TimerBase::SharedPtr timer_;
   rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr publisher_;
   size_t count_;
+  double amplitude_;
+  std::mt19937 generator_{std::random_device{}()};  //伪随机数序列
+  std::normal_distribution<double> noise_dist_{0.0, amplitude_ * 0.01};
 
   void data_make()
   {
-    int cycle = 1;
-    double time1 = 0.01;
+    double cycle = 20;
+    double time1 = 0.001;
     double single_time = count_*time1;
 
 
-    double sin_value = 100*sin(2*M_PI*cycle*single_time);
-    double noise_data = sin_value + 10.0*(rand()%10-5);
+    double sin_value = amplitude_ * sin(2*M_PI*cycle*single_time);
+    double noise_data = sin_value + noise_dist_(generator_);
 
     std_msgs::msg::Float64 noise_msg;
     noise_msg.data = noise_data;
