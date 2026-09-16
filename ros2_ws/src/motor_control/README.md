@@ -1,13 +1,13 @@
 ## 导入
 
-`motor_simulator`是一个ROS2包，直接拉下来放在对应的位置
+`motor_control`是一个ROS2包，直接拉下来放在对应的位置
 
 ## 使用
 
 启动模拟电机节点
 
 ```
-ros2 run motor_simulator motor_simulator_node    
+ros2 run motor_control motor_simulator_node    
 ```
 
 启动后用`ros2 topic list`会显示电机的各个参数的topic名字
