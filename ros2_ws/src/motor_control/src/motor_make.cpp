@@ -32,7 +32,7 @@ public:
                                                                 this,
                                                                 std::placeholders::_1));
                                                               
-    timer_ = this->create_wall_timer(0.1ms, [this](){torque_callback();});
+    timer_ = this->create_wall_timer(1ms, [this](){torque_callback();});
     
     angle_publisher_ = this->create_publisher<std_msgs::msg::Float64>("motor_angle", 10);
     velocity_publisher_ = this->create_publisher<std_msgs::msg::Float64>("motor_velocity", 10);
@@ -62,7 +62,7 @@ private:
     torque_publisher_ -> publish(torque_msg);       
   };
 
-  motor_set motor{0.001,0,0.01,0.0001,0};
+  motor_set motor{0.001,0,0.01,0.001,0};
 
   rclcpp::TimerBase::SharedPtr timer_;
   rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr torque_publisher_;   //发布扭矩

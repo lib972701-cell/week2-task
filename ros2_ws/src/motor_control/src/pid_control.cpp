@@ -35,12 +35,42 @@ public:
   }
 
 private:
+  static double normalize_angle(double delta)
+  {
+    while (delta > M_PI)
+    {
+      delta -= 2 * M_PI;
+    }
+    while (delta < -M_PI)
+    {
+      delta += 2 * M_PI;
+    }
+    return delta;
+  }
+
 //角度环pid
   void angle_subscriber_callback(const std_msgs::msg::Float64::SharedPtr msg)
   {
     auto delta_time = std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::steady_clock::now() - last_control_time_point_1);
-            angle = msg->data;
+            const double this_angle = msg->data;
+
+            if (!angle_initialized)
+            {
+              //刚开始根据优弧的目标设置角度环目标值
+              angle = this_angle;
+              double delta = normalize_angle(target_angle - this_angle);
+              if (delta > 0) delta -= 2 * M_PI;
+              else if (delta < 0) delta += 2 * M_PI;
+              angle_pid.set_target(angle + delta);
+              angle_initialized = true;
+            }
+            else
+            {
+              //根据优弧要求转换实时角度反馈值
+              angle += normalize_angle(this_angle - last_angle);
+            }
+            last_angle = this_angle;
             angle_pid.dt = (1.0f*delta_time.count())/1000.0;
             if(delta_time.count() >= angle_pid.getsample())
             {
@@ -66,14 +96,18 @@ private:
   };
 
   pid velo_pid{2,0.0f,0.0f,0.05,0.007,0.0001,10,-10};
-  pid angle_pid{5,0.0f,(2*M_PI)/3,4.0,0.00,0.00,10,-10};
+  const double target_angle = M_PI/2;
+  pid angle_pid{5,0.0f,0.0f,6.0,0.00,1.00,10,-10};
+  bool angle_initialized = false;
+  double last_angle = 0.0;
+  double velocity;
+  double angle;
+
   rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr torque_publisher_;   //发布扭矩
   rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr ve_subscription_;    //接收实时速度
   rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr angle_subscription_; //接收角度值
   std::chrono::steady_clock::time_point last_control_time_point_1;
   std::chrono::steady_clock::time_point last_control_time_point_2;
-  double velocity;
-  double angle;
 };
 
 int main(int argc, char * argv[])
