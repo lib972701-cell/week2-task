@@ -20,7 +20,7 @@ public:
   : Node("noise_publisher"), count_(0),amplitude_(100.0)
   {
     publisher_ = this->create_publisher<std_msgs::msg::Float64>("noise", 10);   
-    timer_ = this->create_wall_timer(1ms, [this](){data_make();});
+    timer_ = this->create_wall_timer(1ms, [this](){data_make();});//发布频率1000hz
   }
 
 private:
@@ -29,11 +29,11 @@ private:
   size_t count_;
   double amplitude_;
   std::mt19937 generator_{std::random_device{}()};  //伪随机数序列
-  std::normal_distribution<double> noise_dist_{0.0, amplitude_ * 0.01};
+  std::normal_distribution<double> noise_dist_{0.0, amplitude_ * 0.01};//高斯分布
 
   void data_make()
   {
-    double cycle = 20;
+    double cycle = 20;//正弦波频率
     double time1 = 0.001;
     double single_time = count_*time1;
 

@@ -40,6 +40,7 @@ private:
   double receive_data_2{0.0f};
   double lastdata{0.0f};
 
+  //中值滤波
   void middle_process(double data)
   {
     double res;
@@ -67,6 +68,7 @@ private:
     middle_publisher_ -> publish(mid_res);
   }
 
+  //低通滤波
   void lowfilter_process(double data)
   {
     double nowdata;
