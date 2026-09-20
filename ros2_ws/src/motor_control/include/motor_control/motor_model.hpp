@@ -32,6 +32,10 @@ class motor_set{
             {
                 angle -= 2*M_PI;
             }
+            while(angle<0)
+            {
+                angle += 2*M_PI;
+            }
         }
 
         void set_torque(double a){torque = a;}

@@ -10,22 +10,22 @@ find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 add_executable(motor_make src/motor_make.cpp)
-add_executable(velocity_pid src/velocity_pid.cpp)
+add_executable(motor_pid src/pid_control.cpp)
 
 target_include_directories(motor_make PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
-target_include_directories(velocity_pid PRIVATE
+target_include_directories(motor_pid PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/include
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/velocity_pid
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/pid
 )
 
 ament_target_dependencies(motor_make rclcpp std_msgs geometry_msgs)
-ament_target_dependencies(velocity_pid rclcpp std_msgs geometry_msgs)
+ament_target_dependencies(motor_pid rclcpp std_msgs geometry_msgs)
 
 install(TARGETS
   motor_make
-  velocity_pid
+  motor_pid
   DESTINATION lib/${PROJECT_NAME}
 )
 

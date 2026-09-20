@@ -2,7 +2,7 @@
 
 class pid{
     private:
-        int sample_time;      //采样周期，初始化为10ms
+        double sample_time;      //控制周期
         double last_ve;
         double this_ve;
         double target_ve;
@@ -11,11 +11,13 @@ class pid{
         double k_d;
         double error_sigma;
         bool status;
+        double pid_max;
+        double pid_min;
         
         
     public:
         double dt;
-        pid(int st,double lve,double tar,double kp,double ki,double kd)
+        pid(int st,double lve,double tar,double kp,double ki,double kd,double max,double min)
         {
             sample_time = st;
             last_ve = lve;
@@ -26,6 +28,8 @@ class pid{
             k_d = kd;
             error_sigma = 0.0f;
             status = true;
+            pid_max = max;
+            pid_min = min;
         }
          double pid_process(double ve_input,double dt)
         {
@@ -37,9 +41,10 @@ class pid{
             result = k_p * error+k_i * error_sigma-k_d * d_ve;
             last_ve = this_ve;
             status = false;
+            if(result > pid_max){result = pid_max;}
+            if(result < pid_min){result = pid_min;}
             return result;
         }
         int getsample()const{return sample_time;}
         void set_target(double ta){target_ve = ta;}
-
 };
